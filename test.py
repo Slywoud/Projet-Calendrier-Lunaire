@@ -6,23 +6,37 @@ import cv2
 ap = argparse.ArgumentParser()
 args = vars(ap.parse_args())
 
-# load the image, clone it for output, and then convert it to grayscale
-image = cv2.imread('Images/Paysages/ciel02.jpg', cv2.IMREAD_COLOR)
-output = image.copy()
-gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+def moon_finder():
+    global blurred
+    contrast_value = 100
+    circles = None
 
-# detect circles in the image
-circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 1.2, 100)
-# ensure at least some circles were found
-if circles is not None:
-    # convert the (x, y) coordinates and radius of the circles to integers
-    circles = np.round(circles[0, :]).astype("int")
-    # loop over the (x, y) coordinates and radius of the circles
-    for (x, y, r) in circles:
-        # draw the circle in the output image, then draw a rectangle
-        # corresponding to the center of the circle
-        cv2.circle(output, (x, y), r, (0, 255, 0), 4)
-        cv2.rectangle(output, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
-    # show the output image
-    cv2.imshow("output", np.hstack([image, output]))
-    cv2.waitKey(0)
+    while circles is None or len(circles[0]) != 1:
+        #Needs to change to get an image from the file explorer
+        image = cv2.imread('Images/Paysages/Ciel03.jpg', cv2.IMREAD_COLOR)
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+        _, contrast = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        circles = cv2.HoughCircles(
+            blurred, cv2.HOUGH_GRADIENT, dp=2, minDist=1000,
+            param1=250, param2=70, minRadius=5, maxRadius=0)
+
+        contrast_value += 10
+        if contrast_value > 255:
+            return []
+
+        #Displays the image
+        if circles is not None:
+            circles = np.uint16(np.around(circles))
+            for i in circles[0, :]:
+                cv2.circle(image, (i[0], i[1]), i[2], (0, 255, 0), 2)
+                cv2.circle(image, (i[0], i[1]), 2, (0, 0, 255), 3)
+
+            cv2.imshow('Detected Circle', image)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+
+    return [int(n) for n in circles[0][0]]
+
+
+moon_finder()
