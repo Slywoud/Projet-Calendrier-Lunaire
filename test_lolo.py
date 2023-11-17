@@ -3,6 +3,7 @@ from skimage.metrics import structural_similarity as ssim
 import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
+import os
 
 def resize_images(img1, img2):
     # Charger les images
@@ -14,37 +15,45 @@ def resize_images(img1, img2):
 
     return img1, img2
 
+def binarize_image(image):
+    img1_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    _, img1_binary = cv2.threshold(img1_gray, 100, 255, cv2.THRESH_BINARY)
+    return img1_binary
+
 def compare_images(image1, image2):
     # Calculer le SSIM
+    image1, image2 = resize_images(image1, image2)
+    image1 = binarize_image(image1)
+    image2 = binarize_image(image2)
     similarity_index, _ = ssim(image1, image2, full=True)
+    return similarity_index, image1, image2
 
-    return similarity_index
+
 
 # Exemple d'utilisation
 image_path1 = "Images/paysages/Ciel03-edit.jpg"
-image_path2 = "Images/phases/7.png"
+folder_path = "Images/phases/"
 
-# Charger et redimensionner les images
-img1, img2 = resize_images(image_path1, image_path2)
+most_compatible = ''
+max_compatibility = 0.0
 
-# Convertir l'image 1 en noir et blanc (niveaux de gris) et binariser
-img1_gray = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
-_, img1_binary = cv2.threshold(img1_gray, 50, 255, cv2.THRESH_BINARY)
+for i in range(29):  # Images numérotées de 0 à 28
+    image_path = os.path.join(folder_path, f"{i}.png")
 
-# Binariser l'image 2
-_, img2_binary = cv2.threshold(cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY), 128, 255, cv2.THRESH_BINARY)
-
-# Calculer le SSIM
-compatibility = compare_images(img1_binary, img2_binary)
-print(f"Taux de compatibilité : {compatibility}")
+    compatibility, image1, image2 = compare_images(image_path1, image_path)
+    print(f"Taux de compatibilité image {i}: {compatibility}")
+    if compatibility > max_compatibility:
+        max_compatibility = compatibility
+        most_compatible = image2
 
 # Afficher les images binaires pour comparaison visuelle
 plt.subplot(1, 2, 1)
-plt.imshow(img1_binary, cmap='gray')
+plt.imshow(image1, cmap='gray')
 plt.title('Image 1 (binaire)')
 
 plt.subplot(1, 2, 2)
-plt.imshow(img2_binary, cmap='gray')
+plt.imshow(most_compatible, cmap='gray')
 plt.title('Image 2 (binaire)')
 
 plt.show()
+
