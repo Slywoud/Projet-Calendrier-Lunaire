@@ -29,7 +29,7 @@ img1, img2 = resize_images(image_path1, image_path2)
 
 # Convertir l'image 1 en noir et blanc (niveaux de gris) et binariser
 img1_gray = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
-_, img1_binary = cv2.threshold(img1_gray, 128, 255, cv2.THRESH_BINARY)
+_, img1_binary = cv2.threshold(img1_gray, 50, 255, cv2.THRESH_BINARY)
 
 # Binariser l'image 2
 _, img2_binary = cv2.threshold(cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY), 128, 255, cv2.THRESH_BINARY)
