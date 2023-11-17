@@ -9,7 +9,7 @@ for idphase, phase in enumerate(phases):
     with Image(filename='./images/white_circle.jpg') as img:
         radius = img.height // 2
         with Drawing() as draw:
-            draw.fill_color = Color("rgba(0, 0, 0, 0.7)")
+            draw.fill_color = Color("rgba(0, 0, 0, 1)")
             if phase < 0:
                 phase = abs(phase)
                 for y in range(radius):

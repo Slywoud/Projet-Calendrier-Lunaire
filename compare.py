@@ -17,7 +17,9 @@ def resize_images(img1, img2):
 
 def binarize_image(image):
     img1_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    _, img1_binary = cv2.threshold(img1_gray, 100, 255, cv2.THRESH_BINARY)
+    _, img1_binary = cv2.threshold(img1_gray, 50, 255, cv2.THRESH_BINARY)
+    # img1_binary = cv2.adaptiveThreshold(img1_gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, \
+    #                      cv2.THRESH_BINARY, 11, 2)
     return img1_binary
 
 def compare_images(image1, image2):
@@ -31,7 +33,7 @@ def compare_images(image1, image2):
 
 
 # Exemple d'utilisation
-image_path1 = "Images/paysages/Ciel03-edit.jpg"
+image_path1 = "Images/Paysages/Ciel03-edit.jpg"
 folder_path = "Images/phases/"
 
 most_compatible = ''
@@ -45,6 +47,7 @@ for i in range(29):  # Images numérotées de 0 à 28
     if compatibility > max_compatibility:
         max_compatibility = compatibility
         most_compatible = image2
+        most_compatible_name = f"{i}.png"
 
 # Afficher les images binaires pour comparaison visuelle
 plt.subplot(1, 2, 1)
@@ -53,7 +56,7 @@ plt.title('Image 1 (binaire)')
 
 plt.subplot(1, 2, 2)
 plt.imshow(most_compatible, cmap='gray')
-plt.title('Image 2 (binaire)')
+plt.title(most_compatible_name)
 
 plt.show()
 
