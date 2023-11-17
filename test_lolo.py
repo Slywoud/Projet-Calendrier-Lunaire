@@ -1,5 +1,7 @@
 import cv2
 from skimage.metrics import structural_similarity as ssim
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
 def resize_images(img1, img2):
