@@ -28,8 +28,8 @@ def rotation_image(image,degres):
 def calculate_balance(img):
     img = binarize_image(img)
     width = img.shape[0]
-    img_left = img[0:width, :207]
-    img_right = img[0:width, 207:]
+    img_left = img[0:width, :round(width/2)]
+    img_right = img[0:width, round(width/2):]
     pixels_left = cv2.countNonZero(img_left)
     pixels_right = cv2.countNonZero(img_right)
 
@@ -48,9 +48,9 @@ def straighten(img):
 
 
 if __name__ == '__main__':
-    img = cv2.imread('Images/Paysages/Ciel03.jpg')
-    img = cropToCircle(img, 246, 241, 207)
-    # img = rotation_image(img, 15)
+    img = cv2.imread('Images/phases/7.png')
+    # img = cropToCircle(img, 246, 241, 207)
+    img = rotation_image(img, 15)
     cv2.imshow('original', img)
     img = straighten(img)
     cv2.imshow('rotated', img)
