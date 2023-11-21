@@ -14,15 +14,16 @@ for idphase, phase in enumerate(phases):
                 phase = abs(phase)
                 for y in range(radius):
                     x = math.sqrt(radius**2 - y**2)
-                    x = round(x)
-                    X = radius - x
-                    Y = radius - y
+                    x = math.ceil(x)
+                    X = radius - x -1
+                    Y = radius - y -1
                     Y_mirror = radius + y
                     moon_width = 2 * (radius - X)
                     shade = moon_width * phase
-                    shade = round(shade)
+                    shade = math.ceil(shade)
                     x_shade = X + shade
                     draw.line((X, Y), (x_shade, Y))
+                    # print(f'x is {x}, X is {X}, x_shade is {x_shade}, y is {y}, Y is {Y}')
                     if Y_mirror != Y:
                         draw.line((X, Y_mirror), (x_shade, Y_mirror))
                 draw(img)
@@ -32,13 +33,13 @@ for idphase, phase in enumerate(phases):
                 phase = abs(phase)
                 for y in range(radius):
                     x = math.sqrt(radius**2 - y**2)
-                    x = round(x)
+                    x = math.ceil(x)
                     X = radius + x
-                    Y = radius - y
+                    Y = radius - y - 1
                     Y_mirror = radius + y
                     moon_width = 2 * (radius - X)
                     shade = moon_width * phase
-                    shade = round(shade)
+                    shade = math.ceil(shade)
                     x_shade = X + shade
                     draw.line((X, Y), (x_shade, Y))
                     if Y_mirror != Y:
