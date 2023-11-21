@@ -30,33 +30,30 @@ def compare_images(image1, image2):
     similarity_index, _ = ssim(image1, image2, full=True)
     return similarity_index, image1, image2
 
+def get_most_compatible(image_path1, folder_path):
+    most_compatible = ''
+    max_compatibility = 0.0
+    for i in range(29):  # Images numérotées de 0 à 28
+        image_path = os.path.join(folder_path, f"{i}.png")
 
+        compatibility, image1, image2 = compare_images(image_path1, image_path)
+        print(f"Taux de compatibilité image {i}: {compatibility}")
+        if compatibility > max_compatibility:
+            max_compatibility = compatibility
+            most_compatible = image2
+            most_compatible_name = f"Phase : {i}"
+    return most_compatible, most_compatible_name
 
-# Exemple d'utilisation
-image_path1 = "Images\Paysages\Paysage01-edit.jpg"
-folder_path = "Images/phases/"
+if __name__ == '__main__':
+    # Exemple d'utilisation
+    image_path1 = "Images\Paysages\Paysage01-edit.jpg"
+    phases_path = "Images/phases/"
 
-most_compatible = ''
-max_compatibility = 0.0
+    most_compatible, most_compatible_name = get_most_compatible(image_path1, phases_path)
 
-# for i in range(29):  # Images numérotées de 0 à 28
-#     image_path = os.path.join(folder_path, f"{i}.png")
+    # Afficher les images binaires pour comparaison visuelle
+    plt.imshow(most_compatible, cmap='gray')
+    plt.title(most_compatible_name)
 
-#     compatibility, image1, image2 = compare_images(image_path1, image_path)
-#     print(f"Taux de compatibilité image {i}: {compatibility}")
-#     if compatibility > max_compatibility:
-#         max_compatibility = compatibility
-#         most_compatible = image2
-#         most_compatible_name = f"Phase : {i}"
-
-# # Afficher les images binaires pour comparaison visuelle
-# plt.subplot(1, 2, 1)
-# plt.imshow(image1, cmap='gray')
-# plt.title('Image 1 (binaire)')
-
-# plt.subplot(1, 2, 2)
-# plt.imshow(most_compatible, cmap='gray')
-# plt.title(most_compatible_name)
-
-# plt.show()
+    plt.show()
 
