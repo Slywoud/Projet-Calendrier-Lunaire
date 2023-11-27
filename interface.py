@@ -1,4 +1,4 @@
-import compare  # Importez votre fichier compare.py
+import tools
 import tkinter as tk
 from tkinter import filedialog
 import matplotlib.pyplot as plt
@@ -14,20 +14,7 @@ def interface_function(folder_path):
     # Laissez l'utilisateur choisir l'image1
     image_path1 = select_image()
 
-    most_compatible = ''
-    max_compatibility = 0.0
-
-    for i in range(29):  # Images numérotées de 0 à 28
-        image_path = os.path.join(folder_path, f"{i}.png")
-
-        compatibility, image1, image2 = compare.compare_images(image_path1, image_path)
-        print(f"Taux de compatibilité image {i}: {compatibility}")
-        if compatibility > max_compatibility:
-            max_compatibility = compatibility
-            most_compatible = image2
-            most_compatible_name = f"Phase : {i}"
-
-    return max_compatibility, most_compatible, most_compatible_name
+    return tools.get_most_similar(image_path1, folder_path)
 
 # Exemple d'utilisation de la fonction
 if __name__ == "__main__":

@@ -3,6 +3,9 @@ from wand.drawing import Drawing
 from wand.color import Color
 import math
 import numpy
+
+
+
 phases = numpy.arange(-1.0, 1.0, 2/27.3)
 for idphase, phase in enumerate(phases):
     print(phase)
