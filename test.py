@@ -4,23 +4,10 @@ from tkinter import filedialog
 import tkinter as tk
 
 
-def moon_finder():
+def moon_coordinates(img):
     contrast_value = 100
-    root = tk.Tk()
-    root.withdraw()
-    file_path = filedialog.askopenfilename(title="Sélectionnez une image",
-                                           filetypes=[("Fichiers image", "*.png;*.jpg;*.jpeg")])
 
-    # Check si un fichier a été choisi
-    if not file_path:
-        print("Erreur : Aucun fichier sélectionné.")
-        return []
-
-    image = cv2.imread(file_path, cv2.IMREAD_COLOR)
-
-    if image is None:
-        print("Erreur : Impossible de lire l'image.")
-        return []
+    image = cv2.imread(img, cv2.IMREAD_COLOR)
 
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
@@ -35,40 +22,37 @@ def moon_finder():
         param1=250, param2=70, minRadius=5, maxRadius=0)
 
     contrast_value += 10
-    if contrast_value > 255:
+    if contrast_value > 255 or circles is None or len(circles[0]) != 1:
         print("Erreur : Impossible de trouver la lune.")
-        return []
+        return None
 
-    # Affiche l'image
+    return circles, image
+
+
+def circle_display_on_image(image, circles):
     if circles is not None and len(circles[0]) == 1:
+        image_with_circles = image.copy()
+
         circles = np.uint16(np.around(circles))
         for i in circles[0, :]:
-            # Cercle original
-            cv2.circle(image, (i[0], i[1]), i[2], (0, 255, 0), 2)
-            cv2.circle(image, (i[0], i[1]), 2, (0, 0, 255), 3)
+            cv2.circle(image_with_circles, (i[0], i[1]), i[2], (0, 255, 0), 2)
+            cv2.circle(image_with_circles, (i[0], i[1]), 2, (0, 0, 255), 3)
 
-            # Définir une région d'intérêt (ROI) autour du cercle détecté
-            x, y, r = i[0], i[1], i[2]
+        return image_with_circles
 
-            # Ajuster les limites de la ROI pour éviter les indices négatifs ou dépassant les dimensions de l'image
-            roi_x_start = max(0, x - r)
-            roi_x_end = min(image.shape[1], x + r)
-            roi_y_start = max(0, y - r)
-            roi_y_end = min(image.shape[0], y + r)
-
-            roi = image[roi_y_start:roi_y_end, roi_x_start:roi_x_end]
-
-            # Zoom sur la ROI
-            if roi.shape[0] > 0 and roi.shape[1] > 0:
-                zoomed_roi = cv2.resize(roi, (2 * r, 2 * r))
-                cv2.imshow('Zoomed Circle', zoomed_roi)
-                cv2.waitKey(0)
-                cv2.destroyAllWindows()
-            else:
-                print("Erreur : La ROI est vide.")
-                return []
-
-        return [int(n) for n in circles[0][0]]
+    return None
 
 
-moon_finder()
+if __name__ == '__main__':
+    root = tk.Tk()
+    root.withdraw()
+    img = filedialog.askopenfilename(title="Sélectionnez une image",
+                                     filetypes=[("Fichiers image", "*.png;*.jpg;*.jpeg")])
+
+    circles, image = moon_coordinates(img)
+    print("Coordonnées du cercle :", circles)
+
+    final_image = circle_display_on_image(image, circles)
+    cv2.imshow('Final Image', final_image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
