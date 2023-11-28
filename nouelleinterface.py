@@ -16,16 +16,16 @@ class ImageViewer:
         self.image_label.pack(pady=10)
 
         # Curseurs pour ajuster la luminosité, le contraste et l'exposition
-        self.brightness_scale = tk.Scale(root, label="Luminosité", from_=-10, to=10, resolution=1, orient=tk.HORIZONTAL, command=self.update_image)
-        self.brightness_scale.set(0)
+        self.brightness_scale = tk.Scale(root, label="Luminosité", from_=0, to=2, resolution=0.1, orient=tk.HORIZONTAL, command=self.update_brightness)
+        self.brightness_scale.set(1.0)
         self.brightness_scale.pack(pady=5)
 
-        self.contrast_scale = tk.Scale(root, label="Contraste", from_=-10, to=10, resolution=1, orient=tk.HORIZONTAL, command=self.update_image)
-        self.contrast_scale.set(0)
+        self.contrast_scale = tk.Scale(root, label="Contraste", from_=0, to=2, resolution=0.1, orient=tk.HORIZONTAL, command=self.update_contrast)
+        self.contrast_scale.set(1.0)
         self.contrast_scale.pack(pady=5)
 
-        self.exposure_scale = tk.Scale(root, label="Exposition", from_=-10, to=10, resolution=1, orient=tk.HORIZONTAL, command=self.update_image)
-        self.exposure_scale.set(0)
+        self.exposure_scale = tk.Scale(root, label="Exposition", from_=0.1, to=2, resolution=0.1, orient=tk.HORIZONTAL, command=self.update_exposure)
+        self.exposure_scale.set(1.0)
         self.exposure_scale.pack(pady=5)
 
     def open_image(self):
@@ -51,27 +51,38 @@ class ImageViewer:
             self.contrast_scale.set(1.0)
             self.exposure_scale.set(1.0)
 
-    def update_image(self, *args):
-        # Obtenir les valeurs des curseurs
+    def update_brightness(self, *args):
+        # Obtenir la valeur de la jauge de luminosité
         brightness_value = self.brightness_scale.get()
+
+        # Appliquer l'ajustement à l'image
+        enhanced_image = ImageEnhance.Brightness(self.original_image).enhance(brightness_value)
+
+        # Mettre à jour l'affichage
+        self.update_display(enhanced_image)
+
+    def update_contrast(self, *args):
+        # Obtenir la valeur de la jauge de contraste
         contrast_value = self.contrast_scale.get()
+
+        # Appliquer l'ajustement à l'image
+        enhanced_image = ImageEnhance.Contrast(self.original_image).enhance(contrast_value)
+
+        # Mettre à jour l'affichage
+        self.update_display(enhanced_image)
+
+    def update_exposure(self, *args):
+        # Obtenir la valeur de la jauge d'exposition
         exposure_value = self.exposure_scale.get()
 
-        # Appliquer les ajustements à l'image
-        enhanced_image = self.original_image.copy()
+        # Appliquer l'ajustement à l'image
+        enhanced_image = ImageEnhance.Color(self.original_image).enhance(exposure_value)
 
-        # Ajuster la luminosité
-        enhancer = ImageEnhance.Brightness(enhanced_image)
-        enhanced_image = enhancer.enhance(brightness_value)
+        # Mettre à jour l'affichage
+        self.update_display(enhanced_image)
 
-        # Ajuster le contraste
-        enhancer = ImageEnhance.Contrast(enhanced_image)
-        enhanced_image = enhancer.enhance(contrast_value)
-
-        # Ajuster l'exposition (utiliser la méthode enhance pour l'exposition)
-        enhanced_image = ImageEnhance.enhance(enhanced_image, exposure_value)
-
-        # Convertir l'image en un format compatible avec Tkinter
+    def update_display(self, enhanced_image):
+        # Convertir l'image pour Tkinter
         tk_image = ImageTk.PhotoImage(enhanced_image)
 
         # Mettre à jour l'étiquette avec la nouvelle image
@@ -85,6 +96,5 @@ app = ImageViewer(root)
 # Définir la taille minimale de la fenêtre à 800x800 pixels
 root.minsize(800, 800)
 
-# Lancer la boucle principale de l'interface graphique
+# Lancer la boucle principale de l'interface
 root.mainloop()
-
