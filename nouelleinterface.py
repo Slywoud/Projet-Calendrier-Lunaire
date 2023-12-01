@@ -51,58 +51,55 @@ class ImageViewer:
     def update_brightness(self, *args):
         brightness_value = self.brightness_scale.get()
 
-        # Vérifier si tous les curseurs sont à leur valeur minimale
-        if brightness_value == 1.0 and self.contrast_scale.get() == 1.0 and self.exposure_scale.get() == 1.0:
-            enhanced_image = self.original_image
-        else:
-            # Mettre à jour les valeurs actuelles des curseurs
-            self.current_brightness = self.last_brightness_value * brightness_value
-            self.current_contrast = self.current_contrast / self.last_brightness_value * brightness_value
-            self.current_exposure = self.current_exposure / self.last_brightness_value * brightness_value
+        # Éviter la division par zéro ou des valeurs nulles
+        if brightness_value == 0:
+            brightness_value = 0.01
 
-            # Stocker la dernière valeur réelle du curseur
-            self.last_brightness_value = brightness_value
+        # Mettre à jour les valeurs actuelles des curseurs
+        self.current_brightness = self.last_brightness_value * brightness_value
+        self.current_contrast = self.last_contrast_value / max(brightness_value, 0.01)
+        self.current_exposure = self.current_exposure / max(brightness_value, 0.01) * brightness_value
 
-            enhanced_image = self.apply_adjustments()
+        # Stocker la dernière valeur réelle du curseur
+        self.last_brightness_value = brightness_value
 
+        enhanced_image = self.apply_adjustments()
         self.update_display(enhanced_image)
 
     def update_contrast(self, *args):
         contrast_value = self.contrast_scale.get()
 
-        # Vérifier si tous les curseurs sont à leur valeur minimale
-        if self.brightness_scale.get() == 1.0 and contrast_value == 1.0 and self.exposure_scale.get() == 1.0:
-            enhanced_image = self.original_image
-        else:
-            # Mettre à jour les valeurs actuelles des curseurs
-            self.current_brightness = self.current_brightness / self.last_contrast_value * contrast_value
-            self.current_contrast = self.last_contrast_value * contrast_value
-            self.current_exposure = self.current_exposure / self.last_contrast_value * contrast_value
+        # Éviter la division par zéro ou des valeurs nulles
+        if contrast_value == 0:
+            contrast_value = 0.01
 
-            # Stocker la dernière valeur réelle du curseur
-            self.last_contrast_value = contrast_value
+        # Mettre à jour les valeurs actuelles des curseurs
+        self.current_brightness = self.current_brightness / max(self.last_contrast_value, 0.01) * contrast_value
+        self.current_contrast = self.last_contrast_value * contrast_value
+        self.current_exposure = self.current_exposure / max(self.last_contrast_value, 0.01) * contrast_value
 
-            enhanced_image = self.apply_adjustments()
+        # Stocker la dernière valeur réelle du curseur
+        self.last_contrast_value = contrast_value
 
+        enhanced_image = self.apply_adjustments()
         self.update_display(enhanced_image)
 
     def update_exposure(self, *args):
         exposure_value = self.exposure_scale.get()
 
-        # Vérifier si tous les curseurs sont à leur valeur minimale
-        if self.brightness_scale.get() == 1.0 and self.contrast_scale.get() == 1.0 and exposure_value == 1.0:
-            enhanced_image = self.original_image
-        else:
-            # Mettre à jour les valeurs actuelles des curseurs
-            self.current_brightness = self.current_brightness / self.last_exposure_value * exposure_value
-            self.current_contrast = self.current_contrast / self.last_exposure_value * exposure_value
-            self.current_exposure = self.last_exposure_value * exposure_value
+        # Éviter la division par zéro ou des valeurs nulles
+        if exposure_value == 0:
+            exposure_value = 0.01
 
-            # Stocker la dernière valeur réelle du curseur
-            self.last_exposure_value = exposure_value
+        # Mettre à jour les valeurs actuelles des curseurs
+        self.current_brightness = self.current_brightness / max(self.last_exposure_value, 0.01) * exposure_value
+        self.current_contrast = self.current_contrast / max(self.last_exposure_value, 0.01) * exposure_value
+        self.current_exposure = self.last_exposure_value * exposure_value
 
-            enhanced_image = self.apply_adjustments()
+        # Stocker la dernière valeur réelle du curseur
+        self.last_exposure_value = exposure_value
 
+        enhanced_image = self.apply_adjustments()
         self.update_display(enhanced_image)
 
     def apply_adjustments(self):
@@ -120,6 +117,8 @@ class ImageViewer:
         tk_image = ImageTk.PhotoImage(enhanced_image)
         self.image_label.config(image=tk_image)
         self.image_label.image = tk_image
+
+
 
 
 # Créer une instance de la classe ImageViewer
