@@ -132,7 +132,7 @@ class ImageViewer:
 
     def straighten_handler(self):
         img = np.array(self.current_image)
-        self.current_image = Image.fromarray(straighten(img))
+        self.current_image = Image.fromarray(straighten(img, self.binary_threshold_scale.get()))
         self.update_display(self.current_image)
 
     def open_image(self):

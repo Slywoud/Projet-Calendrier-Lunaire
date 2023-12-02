@@ -73,7 +73,7 @@ def calculate_balance(img, thresh_value=50):
     return (pixels_left, pixels_right)
 
 
-def straighten(img):
+def straighten(img, thresh):
     '''
     Takes an image of a moon and attempts to straighten the image so that the moon is vertical
         Paremeters:
@@ -85,10 +85,10 @@ def straighten(img):
     baseline = calculate_balance(img)
     if baseline[0] > baseline[1]:
         # make it so left side has most possible white pixels and right has the least
-        optimal = minimize_scalar(lambda x: calculate_balance(rotate_image(img, x))[1], method='Bounded',
+        optimal = minimize_scalar(lambda x: calculate_balance(rotate_image(img, x), thresh)[1], method='Bounded',
                                   bounds=(-90, 90))
     else:
-        optimal = minimize_scalar(lambda x: calculate_balance(rotate_image(img, x))[0], method='Bounded',
+        optimal = minimize_scalar(lambda x: calculate_balance(rotate_image(img, x), thresh)[0], method='Bounded',
                                   bounds=(-90, 90))
     # print(optimal)
     return rotate_image(img, optimal.x)
