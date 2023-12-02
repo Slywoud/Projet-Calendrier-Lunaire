@@ -28,19 +28,19 @@ class ImageViewer:
         # Curseurs pour ajuster la luminosité, le contraste et l'exposition
         self.brightness_scale = tk.Scale(self.scale_frame, label="Luminosité", from_=0, to=2, resolution=0.1,
                                          orient=tk.HORIZONTAL,
-                                         command=self.update_brightness)
+                                         command=self.update_image)
         self.brightness_scale.set(1.0)
         self.brightness_scale.grid(row=0, column=0)
 
-        self.contrast_scale = tk.Scale(self.scale_frame, label="Contraste", from_=-255, to=255, resolution=1,
+        self.contrast_scale = tk.Scale(self.scale_frame, label="Contraste", from_=0, to=2, resolution=0.1,
                                        orient=tk.HORIZONTAL,
-                                       command=self.update_contrast)
+                                       command=self.update_image)
         self.contrast_scale.set(1.0)
         self.contrast_scale.grid(row=1, column=0)
 
-        self.exposure_scale = tk.Scale(self.scale_frame, label="Exposition", from_=0.1, to=2, resolution=0.1,
+        self.exposure_scale = tk.Scale(self.scale_frame, label="Exposition", from_=0, to=2, resolution=0.1,
                                        orient=tk.HORIZONTAL,
-                                       command=self.update_exposure)
+                                       command=self.update_image)
         self.exposure_scale.set(1.0)
         self.exposure_scale.grid(row=2, column=0)
 
@@ -57,7 +57,6 @@ class ImageViewer:
                       {'text': 'compare', 'command': self.compare_handler, 'image': ''}]
 
         self.stepIndex = 0
-
 
         self.step_button = tk.Button(self.steps_frame, text=self.steps[0]['text'], command=self.steps[0]['command'])
         self.step_button.grid(row=0, column=0, columnspan=2, pady=5)
@@ -161,38 +160,46 @@ class ImageViewer:
         binarized = binarize_image(img, thresh_value=self.binary_threshold_scale.get())
         self.update_display(Image.fromarray(binarized))
 
-    def update_brightness(self, *args):
-        pass
+    def update_image(self, *args):
+        brightness_value = self.brightness_scale.get()
+        contrast_value = self.contrast_scale.get()
+        exposure_value = self.exposure_scale.get()
 
-    def update_contrast(self, *args):
-        if self.current_image:
-            level = self.contrast_scale.get()
-            factor = (259 * (level + 255)) / (255 * (259 - level))
-            print(factor)
+        if brightness_value == 0:
+            brightness_value = 0.01
+        if contrast_value == 0:
+            contrast_value = 0.01
+        if exposure_value == 0:
+            exposure_value = 0.01
 
-            def contrast(c):
-                value = 128 + factor * (c - 128)
-                return max(0, min(255, value))
+        self.current_image = self.original_image.copy()
 
-            self.current_image.point(contrast)
-            self.update_display(self.current_image)
+        enhancer = ImageEnhance.Brightness(self.current_image)
+        self.current_image = enhancer.enhance(brightness_value)
 
-    def update_exposure(self, *args):
-        pass
+        enhancer = ImageEnhance.Contrast(self.current_image)
+        self.current_image = enhancer.enhance(contrast_value)
+
+        enhancer = ImageEnhance.Color(self.current_image)
+        self.current_image = enhancer.enhance(exposure_value)
+
+        self.update_display(self.current_image)
+
+        self.update_display(self.current_image)
 
     def update_display(self, new_image):
         self.steps[self.stepIndex]['image'] = new_image
         to_display = new_image.copy()
         to_display.thumbnail((500, 500))
-        # Convertir l'image pour Tkinter
-        self.tk_image = ImageTk.PhotoImage(to_display)
 
+        self.tk_image = ImageTk.PhotoImage(to_display)
         self.image_label.config(image=self.tk_image)
         # for step in self.steps:
         #     if step['image']:
         #         to_pack = step['image'].copy()
         #         to_pack.thumbnail((150, 150))
         #         tk.Label(self.scrollable_history, image=ImageTk.PhotoImage(to_pack)).pack()
+
 
 class Result(tk.Frame):
     def __init__(self, parent, original_image, cropped_image, phase_image, phase_name):
@@ -223,10 +230,8 @@ class VerticalScrolledFrame(ttk.Frame):
     * Construct and pack/place/grid normally.
     * This frame only allows vertical scrolling.
     """
-
     def __init__(self, parent, *args, **kw):
         ttk.Frame.__init__(self, parent, *args, **kw)
-
         # Create a canvas object and a vertical scrollbar for scrolling it.
         vscrollbar = ttk.Scrollbar(self, orient=VERTICAL)
         vscrollbar.pack(fill=Y, side=RIGHT, expand=FALSE)
@@ -234,16 +239,13 @@ class VerticalScrolledFrame(ttk.Frame):
                            yscrollcommand=vscrollbar.set)
         canvas.pack(side=LEFT, fill=BOTH, expand=TRUE)
         vscrollbar.config(command=canvas.yview)
-
         # Reset the view
         canvas.xview_moveto(0)
         canvas.yview_moveto(0)
-
         # Create a frame inside the canvas which will be scrolled with it.
         self.interior = interior = ttk.Frame(canvas)
         interior_id = canvas.create_window(0, 0, window=interior,
                                            anchor=NW)
-
         # Track changes to the canvas and frame width and sync them,
         # also updating the scrollbar.
         def _configure_interior(event):
@@ -253,24 +255,21 @@ class VerticalScrolledFrame(ttk.Frame):
             if interior.winfo_reqwidth() != canvas.winfo_width():
                 # Update the canvas's width to fit the inner frame.
                 canvas.config(width=interior.winfo_reqwidth())
-
         interior.bind('<Configure>', _configure_interior)
-
         def _configure_canvas(event):
             if interior.winfo_reqwidth() != canvas.winfo_width():
                 # Update the inner frame's width to fill the canvas.
                 canvas.itemconfigure(interior_id, width=canvas.winfo_width())
-
         canvas.bind('<Configure>', _configure_canvas)
 
 
 # Créer une instance de la classe ImageViewer
 root = tk.Tk()
+
 # app = Result(root, Image.open('Images/Paysages/Ciel03.jpg'),
 #              Image.open('Images/Paysages/Ciel03-edit.jpg'),
 #              Image.open('Images/phases/7.png'),
 #              '7.png')
-
 app = ImageViewer(root)
 
 # Définir la taille minimale de la fenêtre à 800x800 pixels
