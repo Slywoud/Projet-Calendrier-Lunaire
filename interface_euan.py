@@ -38,11 +38,11 @@ class ImageViewer:
         self.contrast_scale.set(1.0)
         self.contrast_scale.grid(row=1, column=0)
 
-        self.exposure_scale = tk.Scale(self.scale_frame, label="Exposition", from_=0, to=2, resolution=0.1,
+        self.color_scale = tk.Scale(self.scale_frame, label="Couleur", from_=0, to=2, resolution=0.1,
                                        orient=tk.HORIZONTAL,
                                        command=self.update_image)
-        self.exposure_scale.set(1.0)
-        self.exposure_scale.grid(row=2, column=0)
+        self.color_scale.set(1.0)
+        self.color_scale.grid(row=2, column=0)
 
         self.binary_threshold_scale = tk.Scale(self.scale_frame, label="Set threshold", from_=0, to=255, resolution=1,
                                                orient=tk.HORIZONTAL)
@@ -153,7 +153,7 @@ class ImageViewer:
             # Mettre à jour les curseurs
             self.brightness_scale.set(1.0)
             self.contrast_scale.set(1.0)
-            self.exposure_scale.set(1.0)
+            self.color_scale.set(1.0)
 
     def binarize_handler(self):
         img = np.array(self.current_image)
@@ -165,14 +165,14 @@ class ImageViewer:
             return
         brightness_value = self.brightness_scale.get()
         contrast_value = self.contrast_scale.get()
-        exposure_value = self.exposure_scale.get()
+        color_value = self.color_scale.get()
 
         if brightness_value == 0:
             brightness_value = 0.01
         if contrast_value == 0:
             contrast_value = 0.01
-        if exposure_value == 0:
-            exposure_value = 0.01
+        if color_value == 0:
+            color_value = 0.01
 
         self.current_image = self.original_image.copy()
 
@@ -183,7 +183,7 @@ class ImageViewer:
         self.current_image = enhancer.enhance(contrast_value)
 
         enhancer = ImageEnhance.Color(self.current_image)
-        self.current_image = enhancer.enhance(exposure_value)
+        self.current_image = enhancer.enhance(color_value)
 
         self.update_display(self.current_image)
 
