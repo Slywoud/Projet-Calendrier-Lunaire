@@ -161,6 +161,8 @@ class ImageViewer:
         self.update_display(Image.fromarray(binarized))
 
     def update_image(self, *args):
+        if not isinstance(self.original_image, Image.Image):
+            return
         brightness_value = self.brightness_scale.get()
         contrast_value = self.contrast_scale.get()
         exposure_value = self.exposure_scale.get()
@@ -182,8 +184,6 @@ class ImageViewer:
 
         enhancer = ImageEnhance.Color(self.current_image)
         self.current_image = enhancer.enhance(exposure_value)
-
-        self.update_display(self.current_image)
 
         self.update_display(self.current_image)
 
