@@ -3,7 +3,7 @@ from scipy.optimize import minimize_scalar
 from skimage.metrics import structural_similarity as ssim
 import os
 import numpy as np
-from PIL import Image
+
 
 def crop_to_circle(img, x, y, radius):
     '''
@@ -90,7 +90,6 @@ def straighten(img, thresh):
     else:
         optimal = minimize_scalar(lambda x: calculate_balance(rotate_image(img, x), thresh)[0], method='Bounded',
                                   bounds=(-90, 90))
-    # print(optimal)
     return rotate_image(img, optimal.x)
 
 
@@ -159,11 +158,9 @@ def get_most_similar(image, folder_path, thresh=50):
     max_similarity = 0.0
     for img in os.listdir(folder_path):  # Images numérotées de 0 à 28
         phase_path = os.path.join(folder_path, img)
-        # print(phase_path)
         phase = cv2.imread(phase_path)
         similarity = compare_images(image, phase, thresh)
 
-        # print(f"Taux de compatibilité image {img}: {similarity}")
         if similarity > max_similarity:
             max_similarity = similarity
             most_similar = phase
@@ -186,21 +183,4 @@ def circle_display_on_image(image, circle):
     image_with_circles = image.copy()
     circle = np.uint16(np.around(circle))
     cv2.circle(image_with_circles, (circle[0], circle[1]), circle[2], (0, 255, 0), 2)
-    # cv2.circle(image_with_circles, (i[0], i[1]), 2, (0, 0, 255), 3)
     return image_with_circles
-
-
-if __name__ == '__main__':
-    image = cv2.imread('Images/Paysages/Ciel03.jpg')
-    # cv2.imshow('original', image)
-    print(moon_coordinates(image))
-    moon = moon_coordinates(image)
-    cv2.imshow('moon', circle_display_on_image(image, moon))
-    # cropped_image = crop_to_circle(image, moon_x, moon_y, moon_r)
-    # cv2.imshow('cropped', cropped_image)
-    # straight = straighten(cropped_image)
-    # cv2.imshow('straight', straight)
-    # cv2.imshow('binary', binarize_image(straight))
-    # sim_img, sim_name, sim_index = get_most_similar(cropped_image, 'Images/phases/')
-    # cv2.imshow(sim_name, sim_img)
-    cv2.waitKey(0)
