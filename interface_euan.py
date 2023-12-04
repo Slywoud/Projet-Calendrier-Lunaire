@@ -113,7 +113,7 @@ class ImageViewer:
         phase_img, sim_name, sim_index = get_most_similar(img, 'Images/phases',
                                                           thresh=self.binary_threshold_scale.get())
         self.image_label = Result(self.root, self.original_image, self.current_image, Image.fromarray(phase_img),
-                                  sim_name)
+                                  sim_name, sim_index)
         self.image_label.grid(row=0, column=1, rowspan=6)
 
     def find_moon_handler(self):
@@ -202,7 +202,7 @@ class ImageViewer:
 
 
 class Result(tk.Frame):
-    def __init__(self, parent, original_image, cropped_image, phase_image, phase_name):
+    def __init__(self, parent, original_image, cropped_image, phase_image, phase_name, index):
         tk.Frame.__init__(self, parent)
 
         original_image.thumbnail((500, 500))
@@ -221,7 +221,10 @@ class Result(tk.Frame):
         self.phase_image_label.grid(row=1, column=1, columnspan=1)
 
         self.phase_name_label = tk.Label(self, text=phase_name)
-        self.phase_name_label.grid(row=2, column=0, columnspan=2)
+        self.phase_name_label.grid(row=2, column=0, columnspan=1)
+
+        self.index_label = tk.Label(self, text=f"SSI : {index}")
+        self.index_label.grid(row=2, column=1, columnspan=1)
 
 
 class VerticalScrolledFrame(ttk.Frame):
